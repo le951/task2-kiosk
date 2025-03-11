@@ -1,5 +1,7 @@
 package Level4_And_5;
 
+import Level4_And_5.Menu.Menu;
+
 import java.util.Scanner;
 
 public class Kiosk {
@@ -30,7 +32,6 @@ public class Kiosk {
 
         page_main();
 
-
     }
 
     public void page_main(){
@@ -42,24 +43,26 @@ public class Kiosk {
 
         while(true){
 
-            System.out.println("[ SHAKESHACK MENU ]");
-
-            for(var m : list.values()){
-                System.out.println(m.getName() + " | " + m.getPrice() + " | " + m.getSummary());
-            }
-            System.out.print("\n Type a name for more information : ");
-
-            in = sc.nextLine();
-
-            try {
-                System.out.println("\n"+list.get(in).getDetail());
-            } catch (NullPointerException e) {
-                System.out.println("Unknown name");
-            }
-
-            System.out.println("\nplease enter any key");
-            // 입력 대기
-            sc.nextLine();
+//            System.out.println("[ SHAKESHACK MENU ]");
+//
+//            for(var m : list.values()){
+//                System.out.println(m.getName() + " | " + m.getPrice() + " | " + m.getSummary() + " | " + m.getCategory());
+//            }
+//            System.out.print("\n Type a name for more information : ");
+//
+//            in = sc.nextLine();
+//
+//            if(in.equals("exit")) return;
+//
+//            try {
+//                System.out.println("\n"+list.get(in).getDetail());
+//            } catch (NullPointerException e) {
+//                System.out.println("Unknown name");
+//            }
+//
+//            System.out.println("\nplease enter any key");
+//            // 입력 대기
+//            sc.nextLine();
         }
 
 //        System.out.println("1. ShackBurger   | W 6.9 | ");
