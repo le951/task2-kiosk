@@ -23,8 +23,9 @@ public class Cart {
     private HashMap<Item, Integer> items = new HashMap<>();
 
     // 매 연산마다 수동으로 빼고 더할까, total_update 같은거 만들어서 items 다 돌릴까.
+    // items의 setter를 만들까? 만들 수 있나?
     private int total = 0;
-    private UserType discount_type = UserType.Norman;
+    private UserType discount_type = UserType.Normal;
 
     Cart() {
 
@@ -37,20 +38,28 @@ public class Cart {
 
     void replace(Item item, int quantity) {
         if (items.containsKey(item)) {
+            total -= items.get(item)*item.getPrice();
             if (items.get(item) > quantity){
                 items.replace(item, items.get(item) - quantity);
-
+            } else {
+                items.remove(item);
             }
-            else items.remove(item);
-        }
+        } else System.out.println("product " + item.getName() + "is not included");
     }
 
     void remove(Item item) {
+        total -= items.get(item)*item.getPrice();
         items.remove(item);
     }
 
     void show() {
-
+        items.forEach((item, quantity)->{
+            System.out.println(item.getName() + " / " +  item.getPrice());
+            System.out.println("quantity : " + quantity + " / total price : " + quantity*item.getPrice() + "\n");
+        });
+        System.out.println("total : " + total);
+        System.out.println("discount Type : " + discount_type.type + " / rate : " + discount_type.rate);
+        System.out.println(total*(1-discount_type.rate));
     }
 
     void discount(UserType t) {
@@ -60,7 +69,7 @@ public class Cart {
     void clear() {
         items.clear();
         total = 0;
-        discount_type = UserType.Norman;
+        discount_type = UserType.Normal;
     }
 
 }

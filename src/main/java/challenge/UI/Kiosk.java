@@ -86,6 +86,7 @@ public class Kiosk {
                     break;
                 case "cart":
                     page_cart();
+                    break;
                 default:
                     System.out.println("unknown command");
 
@@ -142,6 +143,33 @@ public class Kiosk {
 
         System.out.println("\n command: exit");
         System.out.print("Type a category name for more information : ");
+        String in;
+
+        in = sc.nextLine();
+
+        switch(in){
+            case "exit":
+                return;
+            default:
+                if(category.containsKey(in)) {
+                    // all에서의 처리와 결과는 같지만, category에 저장된 name을 Key값으로 list에서 호출하는 과정 추가.
+                    // 굳이 Lambda를 써야하나 싶긴 한데, 일단 생각난 김에 써보지 뭐.
+                    category.get(in).forEach(s -> {
+                        var m = list.get(s);
+                        System.out.println(m.getName() + " | " + m.getPrice() + " | " + m.getSummary() + " | " + m.getCategory());
+                    });
+
+                    System.out.print("Type a menu name for more information or order : ");
+                    in = sc.nextLine();
+
+                    System.out.println();
+
+                    page_product(in);
+                } else System.out.println("Unknown category.");
+
+        }
+
+
 
     }
 
@@ -157,8 +185,9 @@ public class Kiosk {
                     if (sc.hasNextInt()) cart.add(list.get(name), sc.nextInt());
                     else {
                         System.out.println("Input error. Backward.");
-                        sc.nextLine();
                     }
+
+                    sc.nextLine();
                     break;
                 case 2:
                     System.out.println(list.get(name).getDetail());
@@ -187,18 +216,35 @@ public class Kiosk {
                     break;
                 case "replace":
                     // 상품 목록을 보여주고, 번호로 선택하는게 확실하겠지.
-                    // 다 이걸로 바꿔볼까.
-                    System.out.println();
+                    // 근데 이러려면 길어지네. 그냥 list로 보여주고 replace로 바꾸고. 그 정도로만 하자.
+                    System.out.println("Enter Item name");
+                    in = sc.nextLine();
+                    if(list.containsKey(in)){
+                        System.out.println("Enter quantity (exam: 1)");
+                        cart.replace(list.get(in), sc.nextInt());
+                        sc.nextLine();
+                    } else System.out.println("Unknown name");
                     break;
                 case "remove":
-
+                    System.out.println("Enter Item name");
+                    in = sc.nextLine();
+                    cart.remove(list.get(in));
                     break;
                 case "discount":
                     System.out.println("Enter Discount Type (Normal : 0 / Staff : 10% / Merit : 10%)");
                     in = sc.nextLine();
+                    if(in.equals(UserType.Staff.type))
+                        cart.discount(UserType.Staff);
+                    else if(in.equals(UserType.Merit.type))
+                        cart.discount(UserType.Merit);
+                    else if(in.equals(UserType.Normal.type))
+                        cart.discount(UserType.Normal);
+                    else System.out.println(in + " is Unknown Type. Input is Not (Normal | Staff | Merit)");
                     break;
                 case "order":
-                    page_cart();
+                    cart.show();
+                    cart.clear();
+                    return;
                 default:
                     System.out.println("unknown command");
 

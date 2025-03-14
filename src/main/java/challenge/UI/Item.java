@@ -5,7 +5,7 @@ public class Item {
     private String name;
     private String summary;
     private String detail;
-    private String category = "aaaa";
+    private String category;
     private boolean available = true;
 
     Item(){
