@@ -1,4 +1,7 @@
-package Level4_And_5.Menu;
+package challenge.Menu;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,30 +9,21 @@ import java.util.Scanner;
 
 public class Menu {
 
-    // 이 경우 list.get(String) 을 넣으면 동등성인가. Object 받는다 되어있어 햇갈리네.
-    // Object의 Equal 기능을 쓰는건가? String.isEqual("");
-    static HashMap<String, MenuItem> list = new HashMap<>();
-    static HashMap<String, ArrayList<MenuItem>> category = new HashMap<>();
-//    Category에 포함된 메뉴가 0일 때 자동 삭제할건가? -> Map
-//    Category 생성을 별도로 할텐가? -> Set
-    // 검색 캐시도 하는 겸 Map으로 하자 그냥.
-    // ArrayList vs LinkedList vs HashMap
-    // category가 빈번하진 않으니 ArrayList로 가자.
+    private static ObjectMapper mapper = new ObjectMapper();
 
-    // 이렇게 list와 category에 담으면 동일 객체를 담는 것이 맞나? new 해주는거 아니면 맞지? heap에 들어가고.
+    static HashMap<String, MenuItem> list = new HashMap<>();
+    static HashMap<String, ArrayList<String>> category = new HashMap<>();
 
     public static void init(){
         Menu.load();
     }
 
-    // 뭐지. 왜 add로 선언하니까 이렇게 나오는거지. IDE가 뭘 본거지? Java는 연산자 오버라이딩 안하는거 아니었나?
-    // 단순 IDE 오류? 일단 써보고. 문제 있으면 오류 뜨겠지.
-    public static void add(String name, String summary, String detail, String category, int price){
+    static void add(String name, String summary, String detail, String category, int price){
         if(list.containsKey(name)) throw new RuntimeException("same name");
         new MenuItem(name, summary, detail, category, price);
     }
 
-    public static void add(String name){
+    static void add(String name){
         add(name, "default summary", "default detail", "default category", 2147483647);
     }
 
@@ -38,16 +32,13 @@ public class Menu {
     // 그러면 Menu Class는 무슨 의미가 있을까. 어차피 MenuItem으로 바로 이어지는데?
     // 단순 분리? list 검색? (JSON-Class)클라이언트 연결 및 전환? 인터페이스? 클라이언트 권한 검사?
     // 나중에는 분리할게 더 생기긴 할 것 같네.
-    public static void rename(String old_name, String new_name){
+    static void rename(String old_name, String new_name){
         list.get(old_name).setName(new_name);
     }
 
-    public static void revise(String name, String summary, String detail, String category, int price){
+    static void revise(String name, String summary, String detail, String category, int price){
         var m = Menu.list.get(name);
 
-//        if(m.getSummary() !=null || !m.getSummary().equals(summary)) m.setSummary(summary);
-//        if(m.getDetail() !=null || !m.getDetail().equals(detail)) m.setDetail(detail);
-//        if(m.getCategory() !=null || !m.getCategory().equals(category)) m.setCategory(category);
         m.setSummary(summary);
         m.setDetail(detail);
         m.setCategory(category);
@@ -56,22 +47,56 @@ public class Menu {
 
 
 
-    public static void remove(String name){
+    static void remove(String name){
         if (!list.containsKey(name)) {
             System.out.println("unknown name");
             return;
         }
         var c = category.get(list.get(name).getCategory());
-        c.remove(list.get(name));
+        c.remove(list.get(name).getCategory());
         if(c.isEmpty()) category.remove(list.get(name).getCategory());
         list.remove(name);
 
         // 여기까지만 하면 GC가 알아서 메모리 치워주나?
+        // 그냥 소멸자를 만들어서 MenuItem에서 처리할까?
+        // 그러면 list.remove(name); 만 하면 GC가 처리하나? 이제 category에 MenuItem 인스턴트는 이어지지 않는데.
+        // list가 유일하게 참조하게 되니까.
     }
 
-    // HashMap 말고 ArrayList로 주는게 나을까. 어차피 비활성 메뉴 등 걸러야 하는데.
-    public static HashMap<String, MenuItem> getList(){
-        return list;
+    // JSON으로 출력. 여기 이후는 클라이언트의 영역. 캡슐화?
+    public static String getList() throws JsonProcessingException {
+
+        // "list의 이름(Key)" : {"name":"내용", "summary":"내용", "detail":"내용", "price":5000},
+        // "Key2" : {"name":"내용", ...
+
+        // size 선언 vs ArrayList.put
+        // 사이,는 join으로 처리
+// JSON 자체 변환
+//        ArrayList<String> out = new ArrayList<>();
+//
+//        list.forEach((name, menuItem) -> {
+//            out.add("\"" + name + "\" : " + menuItem.toString());
+//        });
+
+//        return '{' + String.join(",", out) + '}';
+
+        // Jackson 라이브러리 사용
+        return mapper.writeValueAsString(list);
+    }
+
+
+    public static String getCategory() throws JsonProcessingException {
+
+//        ArrayList<String> out = new ArrayList<>();
+//
+//        category.forEach((name, menuItem) -> {
+//            // menuItem.toString? | String.join(",\n", menuItem)?
+//            out.add("\"" + name + "\" : " + menuItem.toString());
+//        });
+//
+//        return String.join(",", out);
+
+        return mapper.writeValueAsString(category);
     }
 
     // Menu Class에서 이름만 필수값, 나머지는 기본값으로라도 Item을 생성하고
@@ -210,6 +235,29 @@ public class Menu {
                         "\n 452kcal",
                 "burger",
                 5400
+        ));
+        list.put("Tater pubs",new MenuItem(
+                "Tater pubs",
+                "한 입에 쏙 들어가는 해시브라운과 달콤한 양념.",
+                "요청 시 케찹과 머스타드가 제공됩니다." +
+                        "\n 영양 정보 " +
+                        "\n : 밀가루(원산지:미국) / 감자(원산지:혼합) / 양상추(원산지:국산)" +
+                        "\n 단백질 : ? / 탄수화물 : ? / 포화지방 : ? / ..." +
+                        "\n 731kcal",
+                "fry",
+                3200
+        ));
+        // 얼음 X 같은 선택도 넣으면 더 좋겠네. 메뉴 별 옵션. 일단 시간 없으니까.
+        list.put("pepsi",new MenuItem(
+                "pepsi",
+                "펩시 콜라",
+                "요청 시 얼음이 제외됩니다." +
+                        "\n 영양 정보 " +
+                        "\n : 과당 / 식용 색소 / 이산화탄소 " +
+                        "\n 단백질 : ? / 탄수화물 : ? / 포화지방 : ? / ..." +
+                        "\n 288kcal",
+                "drink",
+                1700
         ));
 
     };

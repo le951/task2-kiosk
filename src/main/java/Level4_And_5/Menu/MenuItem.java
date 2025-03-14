@@ -58,6 +58,18 @@ public class MenuItem {
         return available;
     }
 
+    @Override
+    public String toString() {
+        return "{" +
+                "price : " + price +
+                ", name : \"" + name + '\"' +
+                ", summary : \"" + summary + '\"' +
+                ", detail : \"" + detail + '\"' +
+                ", category : \"" + category + '\"' +
+                ", available : " + available +
+                '}';
+    }
+
     void setPrice(int price) {
         this.price = price;
     }

@@ -8,9 +8,9 @@ public class Kiosk {
 
 
     // 일단 Terminal 출력. 나중에는 UI 별개. 클라이언트에서 직접 접근하는 것은 딱 이 클래스로만?
-    // 요청: 메뉴 목록 -> Menu.getList()
-    // 메뉴에 조건, 정렬 구현
-    // 근데 이렇게 하면 다 서버 처리가 되어버리지 않나? 클라이언트에서 처리하는 것도 분리해야겠는데. 단순 정렬.
+    // 요청: 메뉴 목록 -> Menu.getList() / Menu.getCategory()
+    //
+    //
 
     // 주문 입력 -> Cart
     // 주문 초기화 -> Cart.clear
@@ -19,8 +19,8 @@ public class Kiosk {
 
     // 하나의 Kiosk 객체는 한 명의 클라이언트에 대해서 대응함.
 
-    Cart cart;
-    Scanner sc;
+    private Cart cart;
+    private Scanner sc;
 
     Kiosk(){
         // 초기화
@@ -34,35 +34,36 @@ public class Kiosk {
 
     }
 
-    public void page_main(){
+    private void page_main(){
 
         var list = Menu.getList();
+        var category = Menu.getCategory();
+
 
 
         String in;
 
         while(true){
 
-//            System.out.println("[ SHAKESHACK MENU ]");
-//
-//            for(var m : list.values()){
-//                System.out.println(m.getName() + " | " + m.getPrice() + " | " + m.getSummary() + " | " + m.getCategory());
-//            }
-//            System.out.print("\n Type a name for more information : ");
-//
-//            in = sc.nextLine();
-//
-//            if(in.equals("exit")) return;
-//
-//            try {
-//                System.out.println("\n"+list.get(in).getDetail());
-//            } catch (NullPointerException e) {
-//                System.out.println("Unknown name");
-//            }
-//
-//            System.out.println("\nplease enter any key");
-//            // 입력 대기
-//            sc.nextLine();
+
+            System.out.println("\n all / category / exit");
+
+            in = sc.nextLine();
+
+            if(in.equals("exit")) return;
+
+            switch (in){
+                case "all":
+                    System.out.println(list);
+                    break;
+                case "category":
+                    System.out.println(category);
+                    break;
+                default:
+                    System.out.println("unknown command");
+            }
+
+
         }
 
 //        System.out.println("1. ShackBurger   | W 6.9 | ");

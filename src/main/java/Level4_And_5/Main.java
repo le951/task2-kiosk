@@ -18,13 +18,13 @@ public class Main {
             System.out.print("type command : ");
             in = sc.nextLine();
 
-
             if(in.equals("exit")) break;
 
             switch (in){
                 case "kiosk":
                     Kiosk kiosk = new Kiosk();
                     kiosk.start();
+
                     break;
                 case "menu":
                     Menu.cmd();
